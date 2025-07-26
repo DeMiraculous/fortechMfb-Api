@@ -1,9 +1,9 @@
 import { plainToInstance } from "class-transformer";
-import { RegisterDto } from "./auth.dto";
+import { RegisterDto } from "../dto/user.dto";
 import { validate } from "class-validator";
 import { Request, Response } from "express";
-import { UserService } from "./user.service";
-import { User } from "../../generated/prisma";
+import { UserService } from "../service/user.service";
+import { User } from "../../../generated/prisma";
 
 export class UserController {
     constructor(
@@ -39,7 +39,7 @@ export class UserController {
         res.status(200).json(result);
     }
     /**
-* controller method for login
+* controller method for getting a particular user by id
 */
     getUser = async (req: Request, res: Response): Promise<any> => {
         const id = parseInt(req.params.id);
@@ -48,7 +48,8 @@ export class UserController {
         const user = await this.userService.getUserById(id);
         if (!user) return res.status(404).json({ error: 'User not found' });
 
-        return res.json(user);
+        const { password, ...secureUser } = user;
+        return res.json({ user: secureUser });
     };
 
 };

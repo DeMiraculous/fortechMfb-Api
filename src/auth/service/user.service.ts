@@ -1,23 +1,28 @@
-import prisma from "../prisma/prisma.client";
+import prisma from "../../prisma/prisma.client";
 import * as bcrypt from "bcrypt";
-import { LoginUserDto, RegisterDto } from "./auth.dto";
+import { LoginUserDto, RegisterDto } from "../dto/user.dto";
 import jwt from "jsonwebtoken";
-import { User } from "../../generated/prisma";
+import { User } from "../../../generated/prisma";
+import { JWT_SECRET } from "../../config/env";
 
 export class UserService {
+    /**
+ * service method for creating a user
+ */
     async register(data: RegisterDto) {
         const hashedPassword = await bcrypt.hash(data.password, 10);
-        /**
-         * service method for creating a user
-         */
         const user = await prisma.user.create({
             data: { ...data, password: hashedPassword }
         });
+        const { password, ...secureUser } = user; //will help remove the hash password before returning user
 
-        return { message: "Registered", user };
+        return {
+            message: "successfully Registered",
+            user: secureUser
+        };
     }
     /**
- * service method for creating a user
+ * service method for login a user
  * @param LoginUserDto
  */
     async login(data: LoginUserDto) {
@@ -29,7 +34,7 @@ export class UserService {
 
         const token = jwt.sign(
             { id: user.id, email: user.email, role: user.role },
-            process.env.JWT_SECRET!,
+            JWT_SECRET,
             {
                 expiresIn: "1d"
             }

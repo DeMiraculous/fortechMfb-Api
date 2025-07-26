@@ -5,7 +5,8 @@ import cors from "cors";
 
 
 import { PrismaClient } from "@prisma/client";
-import authRouter from "./auth/auth.routes";
+import authRouter from "./auth/routes/auth.routes";
+import { errorHandler } from "./middlewares/error.middleware";
 
 // Initialize environment variables
 dotenv.config();
@@ -26,14 +27,10 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api/auth", authRouter);
-// app.use("/api/users", userRoutes);
 // app.use("/api/kyc", kycRoutes);
 
-// Global error handler (optional)
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ message: "Internal Server Error", error: err.message });
-});
+// Global error handler
+app.use(errorHandler);
 
 // Start server
 const PORT = process.env.PORT || 5000;
