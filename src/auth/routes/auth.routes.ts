@@ -12,4 +12,6 @@ const controller = new UserController(authService);
 authRouter.post("/register", catchAsync(controller.register));
 authRouter.post("/login", catchAsync(controller.login));
 authRouter.get("/user/:id", catchAsync(controller.getUser));
+authRouter.patch("/user:id", catchAsync(controller.updateUserById));
+authRouter.post("/user:phone_number", catchAsync(controller.sendVerificationSMS));
 export default authRouter;  

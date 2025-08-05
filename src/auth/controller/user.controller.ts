@@ -52,5 +52,57 @@ export class UserController {
         return res.json({ user: secureUser });
     };
 
-};
+    /**
+     * update a user
+     */
+    updateUserById = async (req: Request, res: Response) => {
+        try {
+            const updated = await this.userService.updateUserById(req.params.id, req.body);
+            res.json(updated);
+        } catch (err) {
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+    /**
+ * Send Verification otp
+ * @param phone_number
+ * @returns
+ */
+    sendVerificationSMS = async (
+        req: Request,
+        res: Response
+    ): Promise<void> => {
+        const phone_number = req.params.phone;
+        try {
+            await this.userService.sendVerificationSMS(phone_number);
+            res.status(200).json({ message: "OTP sent successfully" });
+        } catch (error) {
+            console.log(error)
+        }
+    };
+    /**
+* Send Verification otp
+* @param phone_number
+* @returns
+*/
+    verifyPhoneNumber = async (
+        req: Request,
+        res: Response
+    ) => {
+        const { phone_number } = req.params;
+        const { activation_otp } = req.body;
+        try {
+            const result = await this.userService.verifyPhoneNumber({
+                phone_number,
+                activation_otp: activation_otp.toString(),
+            });
+            return res.json({ success: result });
+        } catch (error: any) {
+            console.error(error);
+            return res
+                .status(error.statusCode || 500)
+                .json({ message: error.message || "Internal server error" });
+        }
+    }
+}
 
